@@ -4,9 +4,11 @@ from .models import Task
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from drf_yasg.utils import swagger_auto_schema
+from rest_framework.permissions import IsAuthenticated
 
 class ShowTasks(APIView):
-
+    
     def get(self, request):
         try:
             tasks = Task.objects.all()
@@ -33,13 +35,21 @@ class ShowTasks(APIView):
             )
         
 class CreateTasks(APIView):
-        
+
+    permission_classes = [IsAuthenticated]
+    
+    # @swagger_auto_schema(request_body=TaskSerializer)
+    @swagger_auto_schema(
+        request_body=TaskSerializer,
+        security=[{'Bearer': []}],  # ← Tells Swagger this endpoint requires auth
+    )
     def post(self, request):
+        # created_by = request.user
         serializer = TaskSerializer(data=request.data)
 
         if serializer.is_valid():
             try:
-                serializer.save()
+                serializer.save(created_by=request.user)
                 return Response(
                     {
                         'Task': serializer.data,
@@ -87,7 +97,11 @@ class SingleTask(APIView):
             )
 
 class UpdateTask(APIView):
-
+    
+    @swagger_auto_schema(
+        request_body=TaskSerializer,
+        security=[{'Bearer': []}],  # ← Tells Swagger this endpoint requires auth
+    )
     def put(self, request, pk):
         
         try:

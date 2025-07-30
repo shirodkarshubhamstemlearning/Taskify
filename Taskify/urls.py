@@ -17,8 +17,47 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
+
+# ----------------- Swagger Integration ----------------- #
+from rest_framework import permissions
+from drf_yasg.views import get_schema_view
+from drf_yasg import openapi
+from django.urls import re_path
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('api.urls')),
     path('api/users/', include('users.urls')),
+]
+
+
+# ----------------- Swagger Permissions Configuration ---------------- #
+
+
+schema_view = get_schema_view(
+   openapi.Info(
+      title="Taskify API",
+      default_version='v1',
+      description="API documentation with Swagger",
+      terms_of_service="https://www.example.com/terms/",
+      contact=openapi.Contact(email="your@email.com"),
+      license=openapi.License(name="BSD License"),
+   ),
+   public=True,
+   permission_classes=[permissions.AllowAny],
+   authentication_classes=[],
+
+)
+
+
+# ----------------- Swagger URL's Configuration ---------------- #
+
+
+urlpatterns += [
+    
+    # Swagger UI
+    re_path(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+
+    # ReDoc (optional alternative UI)
+    re_path(r'^redoc/$', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
 ]

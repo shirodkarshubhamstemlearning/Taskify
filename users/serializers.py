@@ -69,7 +69,6 @@ class LoginSerializer(serializers.Serializer):
 
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
-        model = CustomUser
-        fields = ['id', 'username', 'email']
-        read_only_fields = ['id', 'username', 'email']
-
+        model = CustomUser  # your user model
+        fields = ['id', 'username', 'email', 'password']
+        extra_kwargs = {'password': {'write_only': True}}

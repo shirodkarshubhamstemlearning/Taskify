@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-d99=5!he3k+rtr)j87u(kndu^4@bbea%c&8^03=^zesiche2@u'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = []
 
@@ -37,11 +37,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'api',
+    'api',                       #    Task related API's app
     'rest_framework',
-    'users',
-    'rest_framework_simplejwt.token_blacklist',
-    "corsheaders",
+    'users',                     #    User Profile API app
+    'rest_framework_simplejwt.token_blacklist',    
+    "corsheaders",               #    Different domain name use
+    'drf_yasg',                  #    Swagger integration import
     # 'django.contrib.sites',
 ]
 
@@ -61,10 +62,12 @@ REST_FRAMEWORK = {
     'DATE_INPUT_FORMATS': ['%d-%m-%Y', '%Y-%m-%d'],
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
     ),
-    # 'DEFAULT_AUTHENTICATION_CLASSES': [
-    #     'rest_framework.authentication.SessionAuthentication',  # Use session-based login
-    # ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',  # Default: Require auth globally (optional)
+    ],
 }
 
 from datetime import timedelta
@@ -162,3 +165,16 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+SWAGGER_SETTINGS = {
+    'SECURITY_DEFINITIONS': {
+        'Bearer': {
+            'type': 'apiKey',
+            'in': 'header',
+            'name': 'Authorization',
+            'description': 'JWT Authorization header using the Bearer scheme. Example: "Bearer <your-token>"',
+        }
+    },
+    'USE_SESSION_AUTH': False,  # Optional: disables login button if not needed
+}

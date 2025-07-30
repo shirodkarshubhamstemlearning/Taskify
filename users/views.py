@@ -46,12 +46,14 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, permissions
 from .serializers import RegisterSerializer, LoginSerializer, ProfileSerializer
-from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.tokens import RefreshToken, TokenError
 from .models import CustomUser
+from drf_yasg.utils import swagger_auto_schema
 
 class RegisterAPIView(APIView):
     permission_classes = [permissions.AllowAny]
-
+    
+    @swagger_auto_schema(request_body=RegisterSerializer)
     def post(self, request):
         serializer = RegisterSerializer(data=request.data)
         if serializer.is_valid():
@@ -62,6 +64,7 @@ class RegisterAPIView(APIView):
 class LoginAPIView(APIView):
     permission_classes = [permissions.AllowAny]
 
+    @swagger_auto_schema(request_body=LoginSerializer)
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
         if serializer.is_valid():
@@ -78,23 +81,37 @@ class LogoutAPIView(APIView):
 
     def post(self, request):
         try:
-            refresh_token = request.data['refresh']
+            refresh_token = request.data.get("refresh")
             token = RefreshToken(refresh_token)
             token.blacklist()
             return Response({'message': 'Logged out successfully'}, status=status.HTTP_205_RESET_CONTENT)
-        except Exception:
-            return Response({'error': 'Invalid or expired token'}, status=status.HTTP_400_BAD_REQUEST)
+        except TokenError as e:
+            return Response({'error': 'Invalid or expired token', 'details': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({'error': 'Something went wrong', 'details': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class ProfileAPIView(APIView):
     permission_classes = [permissions.IsAuthenticated]
-
+    
     def get(self, request):
         serializer = ProfileSerializer(request.user)
         return Response(serializer.data)
-
+    
+    @swagger_auto_schema(request_body=ProfileSerializer)
     def put(self, request):
-        serializer = ProfileSerializer(request.user, data=request.data, partial=True)
+        user = request.user
+        data = request.data.copy()  # make a mutable copy
+        
+        password = data.pop('password', None)  # remove password from data
+        
+        serializer = ProfileSerializer(user, data=data, partial=True)
         if serializer.is_valid():
             serializer.save()
+            
+            if password:
+                user.set_password(password)  # hash the password properly
+                user.save()
+            
             return Response(serializer.data)
+        
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
