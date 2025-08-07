@@ -100,9 +100,16 @@ class ProfileAPIView(APIView):
     @swagger_auto_schema(request_body=ProfileSerializer)
     def put(self, request):
         user = request.user
+
+
+        print(user, "      user user user")
         data = request.data.copy()  # make a mutable copy
+
+        print(data, " data data data datadata data")
         
         password = data.pop('password', None)  # remove password from data
+
+        print(password, "        password password password password password       ")
         
         serializer = ProfileSerializer(user, data=data, partial=True)
         if serializer.is_valid():
