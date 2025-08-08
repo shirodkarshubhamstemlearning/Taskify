@@ -8,6 +8,8 @@ from drf_yasg.utils import swagger_auto_schema
 from rest_framework.permissions import IsAuthenticated
 
 class ShowTasks(APIView):
+
+    permission_classes = [IsAuthenticated]
     
     def get(self, request):
         try:
@@ -49,7 +51,7 @@ class CreateTasks(APIView):
 
         if serializer.is_valid():
             try:
-                serializer.save(created_by=request.user)
+                serializer.save(assignee=request.user, created_by=request.user)
                 return Response(
                     {
                         'Task': serializer.data,
@@ -76,6 +78,8 @@ class CreateTasks(APIView):
         
 class SingleTask(APIView):
 
+    permission_classes = [IsAuthenticated]
+
     def get(self, request, pk):
         try:
             task = get_object_or_404(Task, pk=pk)
@@ -97,6 +101,8 @@ class SingleTask(APIView):
             )
 
 class UpdateTask(APIView):
+
+    permission_classes = [IsAuthenticated]
     
     @swagger_auto_schema(
         request_body=TaskSerializer,
@@ -130,6 +136,8 @@ class UpdateTask(APIView):
             )
 
 class DeleteTask(APIView):
+
+    permission_classes = [IsAuthenticated]
 
     def delete(self, request, pk):
         try:

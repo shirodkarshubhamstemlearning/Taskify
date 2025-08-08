@@ -11,10 +11,11 @@ status_choices = [
 
 class Task(models.Model):
     title = models.CharField(max_length=255, null=False, blank=False)
-    desc = models.TextField(null=True, blank=True)
+    desc = models.TextField(null=False, blank=False)
     assignee = models.CharField(max_length=255, null=False, blank=False)
     status = models.CharField(choices=status_choices, default='To Do')
-    due_date = models.DateField(null=True, blank=True)
+    due_date = models.DateField(null=False, blank=False)
+
     created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     updated_at = models.DateTimeField(auto_now=True)
