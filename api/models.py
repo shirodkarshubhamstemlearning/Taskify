@@ -17,7 +17,7 @@ class Task(models.Model):
     due_date = models.DateField(null=False, blank=False)
 
     created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
-    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=False, blank=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):

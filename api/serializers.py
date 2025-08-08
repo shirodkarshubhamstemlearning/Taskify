@@ -2,7 +2,7 @@ from rest_framework import serializers
 from .models import Task
 
 class TaskSerializer(serializers.ModelSerializer):
-    # created_by = serializers.StringRelatedField(read_only=True)
+    created_by = serializers.StringRelatedField(read_only=True)
     # title = models.CharField(max_length=255, null=False, blank=False)
     title = serializers.CharField(max_length=255)
     status = serializers.CharField()
@@ -27,5 +27,6 @@ class TaskSerializer(serializers.ModelSerializer):
         
         if not data['due_date']:
             raise serializers.ValidationError("Due date is required")
+        
         return data
     
