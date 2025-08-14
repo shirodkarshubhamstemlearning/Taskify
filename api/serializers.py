@@ -10,7 +10,7 @@ class TaskSerializer(serializers.ModelSerializer):
     class Meta:
         
         model = Task
-        fields = ['title', 'desc', 'assignee', 'status', 'due_date', 'created_by']
+        fields = ['id', 'title', 'desc', 'assignee', 'status', 'due_date', 'created_by']
     
     def validate(self, data):
         if not data['title']:
